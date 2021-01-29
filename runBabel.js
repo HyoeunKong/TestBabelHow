@@ -8,6 +8,8 @@ const plugins = [
     '@babel/plugin-transform-template-literals',
     "@babel/plugin-transform-arrow-functions",
 ];
+
+
 const {code} = babel.transformSync(source,{
     filename,
     presets,
