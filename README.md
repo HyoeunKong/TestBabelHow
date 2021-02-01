@@ -49,7 +49,7 @@ module.exports = {
 ```
 
 1. 웹팩으로 번들링(bundling)할 파일을 지정한다.
-2. 번들링된 결과를 dist/conde.bundle.js 파일
+2. 번들링된 결과를 dist/code.bundle.js 파일
 3. 자바스크립트 파일을 babel-loader 가 처리하도록 설정 babel-loader는 바벨의 설정 파일을 이용하므로 이전에 만들어 놓은 babel.config.js 파일의 내용이 설정 값으로 사용됨
 4. 웹팩은 기본적으로 자바스크립트 파일을 압축하지만 바벨이 제대로 실행됐는지 확인하기 위해 압축 기능 끈다.
 
@@ -92,3 +92,35 @@ console.log(code); //6
 - 생성(generate)단계: AST를 코드로 출력한다.
 
  AST는 코드의 구문(syntax)이 분석된 결과를 담고있는 구조체. 코드가 같다면 AST도 같기 때문에 같은 코드에 대해서 하나의 AST를 만들어 놓고 재사용할 수 있다.
+
+ ```javascript
+ //AST를 활용해서 효율적으로 바벨을 실행하는 코드
+const babel = require('@babel/core');
+const fs = require("fs");
+
+const filename = "./src/code.js";
+const source = fs.readFileSync(filename,"utf8");
+const presets = ['@babel/preset-react'];
+
+const {ast} = babel.transformSync(source,{
+    filename,
+    ast:true,
+    code:false,
+    presets,
+    configFile:false
+});
+
+const {code: code1} = babel.transformFromAstSync(ast,source,{
+    filename,
+    plugins:["@babel/plugin-transform-template-literals"],
+    configFile:false,
+});
+const {code:code2} = babel.transformFromAstSync(ast,source,{
+    filename,
+    plugins:['@babel/plugin-transform-arrow-functions'],
+    configFile:false
+});
+
+console.log('code1:\n', code1),
+console.log('code2"\n',code2)
+ ```
